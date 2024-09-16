@@ -10,6 +10,8 @@ import {
   IconButton,
   Typography,
   Box,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Close,
@@ -20,13 +22,13 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 const TextLabel = {
-  fontSize: "13px",
+  fontSize: { xs: "12px", sm: "13px" },
   lineHeight: "15.73px",
   fontWeight: 600,
 };
 
 const HeadingLabel = {
-  fontSize: "16px",
+  fontSize: { xs: "14px", sm: "16px" },
   lineHeight: "28px",
   fontWeight: 600,
   display: "flex",
@@ -66,6 +68,9 @@ const WebinarFormModal = ({
   handleSave,
   webinarFormData,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -107,6 +112,7 @@ const WebinarFormModal = ({
     setFormData((prevData) => ({ ...prevData, [name]: value }));
     setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -153,16 +159,17 @@ const WebinarFormModal = ({
       open={open}
       onClose={handleClose}
       maxWidth="md"
+      fullScreen={isMobile}
       sx={{
         "& .MuiPaper-root": {
-          borderRadius: "10px",
+          borderRadius: isMobile ? 0 : "10px",
         },
       }}
     >
       <DialogTitle>
         <Typography
           variant="h6"
-          sx={{ fontSize: "18px", lineHeight: "28px", fontWeight: 600 }}
+          sx={{ fontSize: { xs: "16px", sm: "18px" }, lineHeight: "28px", fontWeight: 600 }}
         >
           Create webinar
         </Typography>
@@ -179,9 +186,9 @@ const WebinarFormModal = ({
           <PeopleAltOutlined sx={{ mr: 2.5 }} fontSize="small" /> Instructor
           Details
         </Typography>
-        <Box sx={{ ml: 5 }}>
+        <Box sx={{ ml: { xs: 0, sm: 5 } }}>
           <Grid container spacing={2}>
-            <Grid item xs={6.2}>
+            <Grid item xs={12} sm={6.2}>
               <Typography sx={TextLabel}>
                 Instructor Name<span style={RequiredStar}>*</span>{" "}
               </Typography>
@@ -193,7 +200,7 @@ const WebinarFormModal = ({
                 placeholder="Type the instructor name"
                 margin="dense"
                 variant="outlined"
-                sx={getTextFieldStyle("380px")}
+                sx={getTextFieldStyle()}
                 error={!!errors.name}
                 helperText={errors.name}
               />
@@ -208,14 +215,14 @@ const WebinarFormModal = ({
                 placeholder="Type the instructor role"
                 margin="dense"
                 variant="outlined"
-                sx={getTextFieldStyle("380px")}
+                sx={getTextFieldStyle()}
                 error={!!errors.role}
                 helperText={errors.role}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12} sm={4}>
               <Typography sx={TextLabel}>Instructor Image</Typography>
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", justifyContent: isMobile ? "center" : "flex-start" }}>
                 <Box
                   sx={{
                     height: "135px",
@@ -277,8 +284,8 @@ const WebinarFormModal = ({
             </Grid>
           </Grid>
         </Box>
-        <Box sx={{ display: "flex", ml: 5, gap: 5 }}>
-          <div style={{ display: "block" }}>
+        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, ml: { xs: 0, sm: 5 }, gap: { xs: 0, sm: 5 } }}>
+          <div style={{ display: "block", width: "100%" }}>
             <Typography sx={TextLabel}>
               Instructor Company<span style={RequiredStar}>*</span>{" "}
             </Typography>
@@ -290,12 +297,12 @@ const WebinarFormModal = ({
               placeholder="Type the instructor company"
               margin="dense"
               variant="outlined"
-              sx={getTextFieldStyle("380px")}
+              sx={getTextFieldStyle()}
               error={!!errors.company}
               helperText={errors.company}
             />
           </div>
-          <div style={{ display: "block" }}>
+          <div style={{ display: "block", width: "100%" }}>
             <Typography sx={TextLabel}>
               Topics<span style={RequiredStar}>*</span>{" "}
             </Typography>
@@ -307,7 +314,7 @@ const WebinarFormModal = ({
               placeholder="Type the topics"
               margin="dense"
               variant="outlined"
-              sx={getTextFieldStyle("380px")}
+              sx={getTextFieldStyle()}
               error={!!errors.topic}
               helperText={errors.topic}
             />
@@ -316,7 +323,7 @@ const WebinarFormModal = ({
         <Typography variant="subtitle1" sx={HeadingLabel}>
           <VideocamOutlined sx={{ mr: 3 }} fontSize="small" /> Webinar Details
         </Typography>
-        <Box sx={{ ml: 5 }}>
+        <Box sx={{ ml: { xs: 0, sm: 5 } }}>
           <Typography sx={TextLabel}>
             Webinar Title<span style={RequiredStar}>*</span>
           </Typography>
@@ -332,7 +339,7 @@ const WebinarFormModal = ({
             helperText={errors.eventTitle}
           />
           <Grid container spacing={2}>
-            <Grid item xs={3}>
+            <Grid item xs={12} sm={4}>
               <Typography sx={TextLabel}>
                 Start Date<span style={RequiredStar}>*</span>
               </Typography>
@@ -351,7 +358,7 @@ const WebinarFormModal = ({
                 helperText={errors.eventDate}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} sm={4}>
               <Typography sx={TextLabel}>
                 Start Time<span style={RequiredStar}>*</span>
               </Typography>
@@ -370,7 +377,7 @@ const WebinarFormModal = ({
                 helperText={errors.eventStartTime}
               />
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} sm={4}>
               <Typography sx={TextLabel}>
                 End Time<span style={RequiredStar}>*</span>
               </Typography>
@@ -392,13 +399,15 @@ const WebinarFormModal = ({
           </Grid>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "flex-start", p: 2 }}>
+      <DialogActions sx={{ justifyContent: "flex-start", p: 2, flexDirection: isMobile ? "column" : "row" }}>
         <Button
           sx={{
             color: "#fff",
             backgroundColor: "#0E51F1",
             borderRadius: "8px",
             textTransform: "none",
+            width: isMobile ? "100%" : "auto",
+            mb: isMobile ? 1 : 0,
             "&:hover": {
               backgroundColor: "#0a40c1",
             },
@@ -416,6 +425,7 @@ const WebinarFormModal = ({
             fontWeight: 600,
             fontSize: "16px",
             lineHeight: "19.36px",
+            width: isMobile ? "100%" : "auto",
           }}
           onClick={handleClose}
         >
