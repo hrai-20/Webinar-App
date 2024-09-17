@@ -10,20 +10,22 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import WebinarCard from "./WebinarCard";
 
-const PartitionLine = styled("hr")({
-  border: "none",
-  borderTop: "2px solid #ccc",
+const PartitionLine = styled("div")({
+  width: "100%",
+  height: "1px",
+  backgroundColor: "#E3E7EC",
+  marginBottom: "24px",
 });
 
 const Container = styled("div")({
-  padding: "20px 0",
   display: "flex",
   justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "24px",
 });
 
 const SearchBar = styled(TextField)(({ theme }) => ({
@@ -52,7 +54,7 @@ const SearchBar = styled(TextField)(({ theme }) => ({
 }));
 
 const DropdownMenu = styled(FormControl)({
-  width: "200px",
+  width: "150px",
   "& .MuiInputBase-root": {
     height: "48px",
   },
@@ -71,18 +73,62 @@ const DropdownMenu = styled(FormControl)({
   },
 });
 
+const CardGrid = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "20px",
+  justifyContent: "flex-start",
+  margin: "0 auto",
+  width: "100%",
+  padding: "0 0px 40px 0px",
+  boxSizing: "border-box",
+}));
+
+const CardWrapper = styled(Box)(({ theme }) => ({
+  flexGrow: 1,
+  flexBasis: "calc(33.333% - 20px)",
+  maxWidth: "calc(33.333% - 20px)",
+  "&:nth-of-type(3n)": {
+    marginRight: 0,
+  },
+  [theme.breakpoints.down("md")]: {
+    flexBasis: "calc(50% - 10px)",
+    maxWidth: "calc(50% - 10px)",
+    "&:nth-of-type(2n)": {
+      marginRight: 0,
+    },
+  },
+  [theme.breakpoints.down("sm")]: {
+    flexBasis: "100%",
+    maxWidth: "100%",
+    marginRight: 0,
+  },
+}));
+
 const MainContent = ({
   eventData,
   setEventData,
   setWebinarFormData,
   setOpenWebinarForm,
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const [selectedTopic, setSelectedTopic] = React.useState("");
-  const [isSearchFocused, setIsSearchFocused] = React.useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [filteredEvent, setFilteredEvent] = useState(eventData);
-  const [onDeleteCard, setOnDeleteCard] = useState();
-  const uniqueTopics = [...new Set(eventData.map((item) => item.topic))];
+
+  const uniqueTopics = [...new Set(eventData.map((event) => event.topic))];
+
+  useEffect(() => {
+    const filtered = eventData.filter((event) => {
+      const matchesSearch = event.eventTitle
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesTopic =
+        selectedTopic === "" || event.topic === selectedTopic;
+      return matchesSearch && matchesTopic;
+    });
+    setFilteredEvent(filtered);
+  }, [searchQuery, selectedTopic, eventData]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -100,49 +146,17 @@ const MainContent = ({
     setIsSearchFocused(false);
   };
 
-  const handleClear = (event) => {
-    event.stopPropagation();
+  const handleClear = () => {
     setSelectedTopic("");
   };
 
-  useEffect(() => {
-    if (selectedTopic === "") {
-      setFilteredEvent(eventData);
-    } else {
-      const tmpData = eventData.filter((item) => item.topic === selectedTopic);
-      setFilteredEvent(tmpData);
-    }
-  }, [selectedTopic]);
-
-  useEffect(() => {
-    if (searchQuery.length < 3) {
-      setFilteredEvent(eventData);
-    } else {
-      const tmpData = eventData.filter((item) => {
-        const query = searchQuery.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(query) ||
-          item.role.toLowerCase().includes(query) ||
-          item.company.toLowerCase().includes(query) ||
-          item.topic.toLowerCase().includes(query) ||
-          item.eventTitle.toLowerCase().includes(query)
-        );
-      });
-      setFilteredEvent(tmpData);
-    }
-  }, [searchQuery]);
-
-  useEffect(() => {
-    setEventData(eventData.filter((item) => item.id !== onDeleteCard));
-    setFilteredEvent(filteredEvent.filter((item) => item.id !== onDeleteCard));
-  }, [onDeleteCard]);
-
-  useEffect(() => {
-    setFilteredEvent(eventData);
-  }, [eventData]);
+  const setOnDeleteCard = (id) => {
+    const updatedEventData = eventData.filter((event) => event.id !== id);
+    setEventData(updatedEventData);
+  };
 
   return (
-    <div style={{ maxWidth: "90vw", margin: "auto" }}>
+    <div style={{ margin: "0 20px" }}>
       <PartitionLine />
       <Container>
         <SearchBar
@@ -192,24 +206,19 @@ const MainContent = ({
           </Select>
         </DropdownMenu>
       </Container>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          columnGap: 12.95,
-        }}
-      >
+      <CardGrid>
         {filteredEvent.map((event, ind) => (
-          <WebinarCard
-            cardDetail={event}
-            key={ind}
-            ind={ind}
-            setOnDeleteCard={setOnDeleteCard}
-            setOpenWebinarForm={setOpenWebinarForm}
-            setWebinarFormData={setWebinarFormData}
-          />
+          <CardWrapper key={event.id}>
+            <WebinarCard
+              cardDetail={event}
+              ind={ind}
+              setOnDeleteCard={setOnDeleteCard}
+              setOpenWebinarForm={setOpenWebinarForm}
+              setWebinarFormData={setWebinarFormData}
+            />
+          </CardWrapper>
         ))}
-      </Box>
+      </CardGrid>
     </div>
   );
 };

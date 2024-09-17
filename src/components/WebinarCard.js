@@ -22,12 +22,13 @@ const CardColor = (ind) => {
 };
 
 const StyledCard = styled(Card)({
-  width: 350,
-  marginBottom: 30,
+  height: "100%",
+  display: "flex",
+  flexDirection: "column",
   border: "1px solid #E3E7EC",
   borderRadius: 16,
   boxShadow: "0 20px 46px -24px rgba(14,16,19,0.12)",
-  padding: "20px 20px 0px 20px",
+  overflow: "hidden",
 });
 
 const HeaderBox = styled(Box)(({ theme, ind }) => ({
@@ -38,6 +39,7 @@ const HeaderBox = styled(Box)(({ theme, ind }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  margin:"20px 20px 0 20px"
 }));
 
 const StyledAvatar = styled(Avatar)({
@@ -114,6 +116,7 @@ const WebinarCard = ({
     const endTime = formatTime(eventEndTime);
     return `${dayOfWeek} • ${month} ${dayOfMonth}, ${startTime} - ${endTime}`;
   }
+
   return (
     <StyledCard>
       <HeaderBox ind={ind}>
@@ -164,7 +167,15 @@ const WebinarCard = ({
           alt={cardDetail.name}
         />
       </HeaderBox>
-      <CardContent sx={{ paddingLeft: 0, paddingRight: 0 }}>
+      <CardContent
+        sx={{
+          paddingLeft: "20px",
+          paddingRight: "20px",
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography
           variant="body2"
           color={CardColor(ind)}
@@ -207,11 +218,17 @@ const WebinarCard = ({
             cardDetail.eventEndTime
           )}
         </Typography>
-        <Box sx={{ display: "flex" }}>
+        <Box
+          sx={{
+            display: "flex",
+            marginTop: "auto",
+            justifyContent: "flex-start",
+            gap: 2,
+          }}
+        >
           <DeleteButton
             variant="contained"
             disableElevation
-            sx={{ px: 3.5 }}
             onClick={() => {
               setOnDeleteCard(cardDetail.id);
             }}
